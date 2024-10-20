@@ -41,6 +41,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -668,4 +669,28 @@ public class SavingsAccountsApiResource {
 
         return SavingsAccountData.withTemplateOptions(savingsAccount, templateData, transactions, charges);
     }
+
+    // savings birthday endpoint
+    @GET
+    @Path("by-birthdate")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Operation(summary = "Retrieve Savings Accounts by Client Birthdate",
+            description = "Retrieve savings accounts where the client’s birthdate matches the provided date.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(schema = @Schema(implementation = SavingsAccountData.class)))
+    })
+    public String retrieveSavingsAccountsByBirthdate(
+            @QueryParam("birthdate") @Parameter(description = "Client birthdate in 'YYYY-MM-DD' format") final String birthdateStr,
+            @Context final UriInfo uriInfo) {
+
+        context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
+        final LocalDate birthdate = LocalDate.parse(birthdateStr);
+        final Collection<SavingsAccountData> savingsAccounts = savingsAccountReadPlatformService.retrieveSavingsAccountsByBirthdate(birthdate);
+
+        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return toApiJsonSerializer.serialize(settings, savingsAccounts, SavingsApiSetConstants.SAVINGS_ACCOUNT_RESPONSE_DATA_PARAMETERS);
+    }
+
 }

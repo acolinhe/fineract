@@ -692,6 +692,7 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
 
         SavingAccountMapper() {
             final StringBuilder sqlBuilder = new StringBuilder(400);
+
             sqlBuilder.append("sa.id as id, sa.account_no as accountNo, sa.external_id as externalId, ");
             sqlBuilder.append("sa.deposit_type_enum as depositType, ");
             sqlBuilder.append("c.id as clientId, c.display_name as clientName, ");
@@ -995,6 +996,41 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
                     daysToInactive, daysToDormancy, daysToEscheat, onHoldAmount);
         }
     }
+
+    private static final class SavingsAccountByBirthdateMapper implements RowMapper<SavingsAccountData> {
+
+        private final String schemaSql;
+
+        SavingsAccountByBirthdateMapper() {
+            final StringBuilder sqlBuilder = new StringBuilder(200);
+            sqlBuilder.append("sa.id as id, sa.account_no as accountNo, ");
+            sqlBuilder.append("c.id as clientId, c.display_name as clientName, ");
+            sqlBuilder.append("sa.status_enum as statusEnum ");
+            sqlBuilder.append("from m_savings_account sa ");
+            sqlBuilder.append("join m_client c on sa.client_id = c.id ");
+            sqlBuilder.append("where sa.status_enum = 300 and c.birthdate = ? ");  // Added filtering by birthdate
+            this.schemaSql = sqlBuilder.toString();
+        }
+
+        public String schema() {
+            return this.schemaSql;
+        }
+
+        @Override
+        public SavingsAccountData mapRow(final ResultSet rs, @SuppressWarnings("unused") final int rowNum) throws SQLException {
+            final Long id = rs.getLong("id");
+            final String accountNo = rs.getString("accountNo");
+            final Long clientId = JdbcSupport.getLong(rs, "clientId");
+            final String clientName = rs.getString("clientName");
+            final Integer statusEnum = JdbcSupport.getInteger(rs, "statusEnum");
+            final SavingsAccountStatusEnumData status = SavingsEnumerations.status(statusEnum);
+
+            // Using the birthday lookup constructor
+            return SavingsAccountData.lookupByBirthday(id, accountNo, clientId, clientName, status);
+        }
+    }
+
+
 
     private static final class SavingAccountMapperForLookup implements RowMapper<SavingsAccountData> {
 
@@ -1737,4 +1773,14 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
     public Long retrieveAccountIdByExternalId(final ExternalId externalId) {
         return savingsAccountRepositoryWrapper.findIdByExternalId(externalId);
     }
+
+    @Override
+    public List<SavingsAccountData> retrieveSavingsAccountsByBirthdate(LocalDate birthdate) {
+        final StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("select " + new SavingsAccountByBirthdateMapper().schema());
+        sqlBuilder.append(" where c.birthdate = ? and sa.status_enum = 300");
+
+        return this.jdbcTemplate.query(sqlBuilder.toString(), new SavingsAccountByBirthdateMapper(), new Object[] { birthdate });
+    }
+
 }

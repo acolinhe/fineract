@@ -71,4 +71,7 @@ public interface SavingsAccountReadPlatformService {
     List<SavingsAccountTransactionData> retrieveAllTransactionData(List<String> refNo);
 
     Long retrieveAccountIdByExternalId(ExternalId externalId);
+
+    List<SavingsAccountData> retrieveSavingsAccountsByBirthdate(LocalDate birthdate);
+
 }

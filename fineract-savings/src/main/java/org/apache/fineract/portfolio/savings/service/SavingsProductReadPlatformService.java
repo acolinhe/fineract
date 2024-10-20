@@ -32,5 +32,4 @@ public interface SavingsProductReadPlatformService {
     Collection<SavingsProductData> retrieveAllForCurrency(String currencyCode);
 
     SavingsProductData retrieveOne(Long productId);
-
 }

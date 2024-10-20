@@ -529,6 +529,77 @@ public final class SavingsAccountData implements Serializable {
                 isDormancyTrackingActive, daysToInactive, daysToDormancy, daysToEscheat, savingsAmountOnHold);
     }
 
+    public static SavingsAccountData lookupByBirthday(final Long accountId, final String accountNo, final Long clientId,
+            final String clientName, final SavingsAccountStatusEnumData status) {
+        // Returning only the necessary fields for this feature
+        return new SavingsAccountData(accountId, accountNo, clientId, clientName, status);
+    }
+
+    // added constructor for birthday lookup
+    public SavingsAccountData(final Long accountId, final String accountNo, final Long clientId, final String clientName,
+            final SavingsAccountStatusEnumData status) {
+        this.id = accountId;
+        this.accountNo = accountNo;
+        this.clientId = clientId;
+        this.clientName = clientName;
+        this.status = status;
+
+        this.depositType = null;
+        this.externalId = null;
+        this.groupId = null;
+        this.groupName = null;
+        this.savingsProductId = null;
+        this.savingsProductName = null;
+        this.fieldOfficerId = null;
+        this.fieldOfficerName = null;
+        this.subStatus = null;
+        this.reasonForBlock = null;
+        this.timeline = null;
+        this.currency = null;
+        this.nominalAnnualInterestRate = null;
+        this.interestCompoundingPeriodType = null;
+        this.interestPostingPeriodType = null;
+        this.interestCalculationType = null;
+        this.interestCalculationDaysInYearType = null;
+        this.minRequiredOpeningBalance = null;
+        this.lockinPeriodFrequency = null;
+        this.lockinPeriodFrequencyType = null;
+        this.withdrawalFeeForTransfers = false;
+        this.allowOverdraft = false;
+        this.overdraftLimit = null;
+        this.minRequiredBalance = null;
+        this.enforceMinRequiredBalance = false;
+        this.maxAllowedLienLimit = null;
+        this.lienAllowed = false;
+        this.minBalanceForInterestCalculation = null;
+        this.onHoldFunds = null;
+        this.withHoldTax = false;
+        this.taxGroup = null;
+        this.lastActiveTransactionDate = null;
+        this.isDormancyTrackingActive = false;
+        this.daysToInactive = null;
+        this.daysToDormancy = null;
+        this.daysToEscheat = null;
+        this.savingsAmountOnHold = null;
+        this.summary = null;
+        this.transactions = null;
+        this.charges = null;
+        this.productOptions = null;
+        this.fieldOfficerOptions = null;
+        this.interestCompoundingPeriodTypeOptions = null;
+        this.interestPostingPeriodTypeOptions = null;
+        this.interestCalculationTypeOptions = null;
+        this.interestCalculationDaysInYearTypeOptions = null;
+        this.lockinPeriodFrequencyTypeOptions = null;
+        this.withdrawalFeeTypeOptions = null;
+        this.chargeOptions = null;
+
+        this.withdrawalFee = null;
+        this.annualFee = null;
+        this.nominalAnnualInterestRateOverdraft = BigDecimal.ZERO;
+        this.minOverdraftForInterestCalculation = BigDecimal.ZERO;
+    }
+
     public static SavingsAccountData lookup(final Long accountId, final String accountNo, final EnumOptionData depositType) {
 
         final String externalId = null;
